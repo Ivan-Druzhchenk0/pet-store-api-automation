@@ -33,9 +33,25 @@ export class Pet extends BaseAPI {
     })
   }
 
-  async updatePet(pet: PetInterface) {
+  /* Update a pet by merging current data with new data.
+   * This ensures that only the fields provided in `petData` are updated,
+   * while keeping the existing values for fields not included in `petData`.
+   */
+
+  async updatePet(data: { petId: number; petData: Partial<PetInterface> }) {
+    // First, get the current pet data
+    const currentPetResponse = await this.request.get(`/v2/pet/${data.petId}`)
+    const currentPet = await currentPetResponse.json()
+
+    // Merge current data with updates
+    const updatedPet = {
+      id: data.petId, // Ensure ID is always correct
+      ...currentPet,
+      ...data.petData,
+    }
+
     return this.request.put('/v2/pet', {
-      data: pet,
+      data: updatedPet,
     })
   }
 
