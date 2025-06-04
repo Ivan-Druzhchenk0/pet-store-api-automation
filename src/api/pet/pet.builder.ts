@@ -5,7 +5,6 @@ export class PetBuilder {
 
   constructor() {
     this.pet = {
-      id: 0,
       name: '',
       status: 'available', // Default status
     }

@@ -1,7 +1,7 @@
 export type PetStatus = 'available' | 'pending' | 'sold'
 
 export interface PetInterface {
-  id: number
+  id?: number
   category?: {
     id: number
     name: string
