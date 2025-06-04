@@ -4,37 +4,57 @@ import { test } from '../fixtures'
 import { PetStatus } from '../api/pet/pet.interfaces'
 import { PetBuilder } from '../api/pet/pet.builder'
 
-test('Create a pet with id', async ({ api }) => {
-  const newPet = new PetBuilder()
-    .setId(112233)
-    .setName('Buddy')
-    .setStatus('available' as PetStatus)
-    .build()
+test.describe('CRUD pet by id', () => {
+  test.describe.configure({ mode: 'serial' })
 
-  const response = await api.pet.addNewPet(newPet)
+  const petId = 11
+  const petName = 'Buddy'
 
-  const responseBody = await response.json()
-  expect(response.status()).toBe(200)
-  expect(responseBody.id).toBe(newPet.id)
-  expect(responseBody.name).toBe(newPet.name)
-})
+  test('Create a pet with id', async ({ api }) => {
+    const newPet = new PetBuilder().setId(petId).setName(petName).build()
 
-test('Get a pet by ID', async ({ api }) => {
-  const petId = 112233
+    const response = await api.pet.addNewPet(newPet)
 
-  const response = await api.pet.getPetById(petId)
+    const responseBody = await response.json()
+    expect(response.status()).toBe(200)
+    expect(responseBody.id).toBe(newPet.id)
+    expect(responseBody.name).toBe(newPet.name)
+  })
 
-  const responseBody = await response.json()
-  expect(response.status()).toBe(200)
-  expect(responseBody.id).toBe(petId)
-  expect(responseBody.name).toBe('Buddy')
+  test('Get a pet by ID', async ({ api }) => {
+    const response = await api.pet.getPetById(petId)
+
+    const responseBody = await response.json()
+    expect(response.status()).toBe(200)
+    expect(responseBody.id).toBe(petId)
+    expect(responseBody.name).toBe(petName)
+  })
+
+  test('Update a pet', async ({ api }) => {
+    const updatedPet = { status: 'available' as PetStatus }
+
+    const response = await api.pet.updatePet({
+      petId: petId,
+      petData: updatedPet,
+    })
+
+    const responseBody = await response.json()
+    expect(response.status()).toBe(200)
+    expect(responseBody.id).toBe(petId)
+    expect(responseBody.name).toBe(petName)
+    expect(responseBody.status).toBe(updatedPet.status)
+  })
+
+  test('Detete a pet', async ({ api }) => {
+    const response = await api.pet.deletePet(petId)
+
+    expect(response.status()).toBe(200)
+    console.log(await response.text())
+  })
 })
 
 test('Create a pet without id', async ({ api }) => {
-  const newPetWithoutId = new PetBuilder()
-    .setName('Charlie')
-    .setStatus('available' as PetStatus)
-    .build()
+  const newPetWithoutId = new PetBuilder().setName('Charlie').build()
 
   const response = await api.pet.addNewPet(newPetWithoutId)
 
