@@ -1,17 +1,6 @@
-import path from 'path'
+import { defineConfig } from '@playwright/test'
 
-import { devices } from '@playwright/test'
-
-import dotenv from 'dotenv'
-
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, '.env') })
-
-/**
- * @see https://playwright.dev/docs/test-configuration
- */
-const config = {
-  expect: { timeout: 10 * 1000 },
+export default defineConfig({
   timeout: 45 * 1000,
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -22,52 +11,17 @@ const config = {
   workers: process.env.CI ? '50%' : '50%',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['list'], ['html']],
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'https://petstore.swagger.io',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'retain-on-failure',
-    video: 'on',
+    extraHTTPHeaders: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
   },
-
-  /* Configure projects for major browsers */
   projects: [
     {
-      name: 'Chrome',
-      testMatch: /.*\.spec\.ts/,
-      use: {
-        ...devices['Desktop Chrome'],
-        screenshot: {
-          mode: 'only-on-failure',
-          fullPage: true,
-        },
-      },
-    },
-    {
-      name: 'Firefox',
-      testMatch: /.*\.spec\.ts/,
-      use: {
-        ...devices['Desktop Firefox'],
-        screenshot: {
-          mode: 'only-on-failure',
-          fullPage: true,
-        },
-      },
-    },
-    {
-      name: 'Safari',
-      testMatch: /.*\.spec\.ts/,
-      use: {
-        ...devices['Desktop Safari'],
-        screenshot: {
-          mode: 'only-on-failure',
-          fullPage: true,
-        },
-      },
+      name: 'api-tests',
+      use: {},
     },
   ],
-}
-
-export default config
+})
