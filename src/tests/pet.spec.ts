@@ -7,6 +7,12 @@ import { PetBuilder } from '../api/pet/pet.builder'
 test.describe('CRUD pet by id', () => {
   test.describe.configure({ mode: 'serial' })
 
+  // Timeout needed as API is slow and tests fail without it
+  test.afterEach(async () => {
+    // Wait 2 seconds before each test
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+  })
+
   const petId = 11
   const petName = 'Buddy'
 
@@ -49,7 +55,6 @@ test.describe('CRUD pet by id', () => {
     const response = await api.pet.deletePet(petId)
 
     expect(response.status()).toBe(200)
-    console.log(await response.text())
   })
 })
 
