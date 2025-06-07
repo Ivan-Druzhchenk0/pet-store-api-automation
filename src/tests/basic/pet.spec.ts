@@ -1,9 +1,9 @@
 import { expect } from '@playwright/test'
-import { test } from '../fixtures'
+import { test } from '../../fixtures'
 
-import { PetStatus } from '../api/pet/pet.interfaces'
-import { PetBuilder } from '../api/pet/pet.builder'
-import { petId, petName } from '../test-data/pet'
+import { PetStatus } from '../../api/pet/pet.interfaces'
+import { PetBuilder } from '../../api/pet/pet.builder'
+import { petId, petName } from '../../test-data/pet'
 
 test.describe('CRUD pet by id', () => {
   test.describe.configure({ mode: 'serial' })
