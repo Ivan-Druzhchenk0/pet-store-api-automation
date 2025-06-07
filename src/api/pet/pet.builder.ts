@@ -5,8 +5,8 @@ export class PetBuilder {
 
   constructor() {
     this.pet = {
-      name: '',
-      status: 'available', // Default status
+      name: '', // Assume that this is a required field
+      status: 'available', // Assume that this is a required field.
     }
   }
 
