@@ -1,8 +1,10 @@
-/* Used in schemaValidation tests to validate the pet schema and pet array schema */
-
 import Ajv from 'ajv'
 import { APIResponse } from '@playwright/test'
 import { petSchema } from '../schemas/pet.schema'
+import {
+  petErrorSchema,
+  validationErrorSchema,
+} from '../schemas/pet.error-schema'
 
 const ajv = new Ajv()
 
@@ -41,6 +43,35 @@ export async function validatePetArraySchema(response: APIResponse) {
       )
     }
   })
+
+  return responseBody
+}
+export async function validatePetErrorSchema(response: APIResponse) {
+  const responseBody = await response.json()
+  const validate = ajv.compile(petErrorSchema)
+  const isValid = validate(responseBody)
+
+  if (!isValid) {
+    const errors = validate.errors
+      ?.map((error) => `${error.instancePath} ${error.message}`)
+      .join(', ')
+    throw new Error(`Pet error schema validation failed: ${errors}`)
+  }
+
+  return responseBody
+}
+
+export async function validatePetValidationErrorSchema(response: APIResponse) {
+  const responseBody = await response.json()
+  const validate = ajv.compile(validationErrorSchema)
+  const isValid = validate(responseBody)
+
+  if (!isValid) {
+    const errors = validate.errors
+      ?.map((error) => `${error.instancePath} ${error.message}`)
+      .join(', ')
+    throw new Error(`Pet validation error schema validation failed: ${errors}`)
+  }
 
   return responseBody
 }
