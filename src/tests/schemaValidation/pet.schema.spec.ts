@@ -3,16 +3,16 @@ import { test } from '../../fixtures'
 
 import { PetStatus } from '../../api/pet/pet.interfaces'
 import { PetBuilder } from '../../api/pet/pet.builder'
-import { petId, petName } from '../../test-data/pet'
+import { petId, petName } from '../../test-data/entities/pet'
 
-import { validatePetSchema } from '../../helpers/assertions/schema-validator'
+import { validatePetSchema } from '../../helpers/assertions/pet.schema-validator'
 
 test.describe('CRUD pet by id', () => {
   test.describe.configure({ mode: 'serial' })
 
-  // Timeout needed as API is slow and tests fail without it
+  // Delay needed to avoid errors with API rate limits
   test.afterEach(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 8000))
+    await new Promise((resolve) => setTimeout(resolve, 5000))
   })
 
   const id = petId().id
@@ -38,7 +38,7 @@ test.describe('CRUD pet by id', () => {
   })
 
   test('Update a pet', async ({ api }) => {
-    const updatedPet = { status: 'available' as PetStatus }
+    const updatedPet = { name: 'Good boy', status: 'available' as PetStatus }
 
     const response = await api.pet.updatePet({
       petId: id,
