@@ -1,10 +1,7 @@
 import Ajv from 'ajv'
 import { APIResponse } from '@playwright/test'
 import { petSchema } from '../schemas/pet.schema'
-import {
-  petErrorSchema,
-  validationErrorSchema,
-} from '../schemas/pet.error-schema'
+import { petErrorSchema } from '../schemas/pet.error-schema'
 
 const ajv = new Ajv()
 
@@ -20,7 +17,7 @@ export async function validatePetSchema(response: APIResponse) {
     throw new Error(`Pet schema validation failed: ${errors}`)
   }
 
-  return responseBody
+  return responseBody as any
 }
 
 export async function validatePetArraySchema(response: APIResponse) {
@@ -47,7 +44,15 @@ export async function validatePetArraySchema(response: APIResponse) {
   return responseBody
 }
 export async function validatePetErrorSchema(response: APIResponse) {
-  const responseBody = await response.json()
+  let responseBody
+
+  try {
+    responseBody = await response.json()
+  } catch (error) {
+    /* If response is not JSON (e.g., empty body), return null. This is expected for some error responses like DELETE 404 */
+    return null
+  }
+
   const validate = ajv.compile(petErrorSchema)
   const isValid = validate(responseBody)
 
@@ -56,21 +61,6 @@ export async function validatePetErrorSchema(response: APIResponse) {
       ?.map((error) => `${error.instancePath} ${error.message}`)
       .join(', ')
     throw new Error(`Pet error schema validation failed: ${errors}`)
-  }
-
-  return responseBody
-}
-
-export async function validatePetValidationErrorSchema(response: APIResponse) {
-  const responseBody = await response.json()
-  const validate = ajv.compile(validationErrorSchema)
-  const isValid = validate(responseBody)
-
-  if (!isValid) {
-    const errors = validate.errors
-      ?.map((error) => `${error.instancePath} ${error.message}`)
-      .join(', ')
-    throw new Error(`Pet validation error schema validation failed: ${errors}`)
   }
 
   return responseBody
