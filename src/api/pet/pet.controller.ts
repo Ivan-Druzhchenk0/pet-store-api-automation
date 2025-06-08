@@ -39,13 +39,23 @@ export class Pet extends BaseAPI {
    */
 
   async updatePet(data: { petId: number; petData: Partial<PetInterface> }) {
-    // First, get the current pet data
+    // First, try to get the current pet data
     const currentPetResponse = await this.request.get(`/v2/pet/${data.petId}`)
-    const currentPet = await currentPetResponse.json()
+    let currentPet = {}
 
-    // Merge current data with updates
+    // If we can get current pet data, use it for merging
+    if (currentPetResponse.status() === 200) {
+      try {
+        currentPet = await currentPetResponse.json()
+      } catch (error) {
+        // If JSON parsing fails, use empty object
+        currentPet = {}
+      }
+    }
+
+    // Merge current data with updates, ensuring ID is preserved
     const updatedPet = {
-      id: data.petId, // Ensure ID is always correct
+      id: data.petId,
       ...currentPet,
       ...data.petData,
     }
